@@ -32,7 +32,15 @@ def play_get(path):
 
 def play_json(path):
     with play_get(path) as response:
-        return json.load(response)
+        raw = response.read()
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            raise RuntimeError(
+                f"Play returned non-JSON for {path}: HTTP {response.status}, "
+                f"type={response.headers.get('Content-Type')}, bytes={len(raw)}, "
+                f"prefix={raw[:160]!r}"
+            ) from None
 
 
 def github(*args):
