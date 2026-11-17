@@ -32,6 +32,8 @@ def play_get(path):
 
 def play_json(path):
     with play_get(path) as response:
+        if response.status == 204 and path.startswith("tracks/"):
+            return {"releases": []}
         raw = response.read()
         try:
             return json.loads(raw)
